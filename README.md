@@ -13,10 +13,40 @@ This project aims to do the following:
 - Visualize insights through interactive dashboard
 
 ## Architecture (Work in progress)
+
 ```
-[Market Data API] → [Ingestion Service] → [Message Queue] → [Processing Service]
-                                                                      ↓
-[Dashboard] ← [FastAPI] ← [Database] ← [Storage Layer] ←────────────┘
+┌─────────────────┐
+│  Market Data    │
+│      API        │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Ingestion     │
+│    Service      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│     Kafka/      │
+│    Kinesis      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Processing    │
+│    Service      │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ┌─────────────┐
+│   PostgreSQL    │────▶│   FastAPI   │
+│   TimescaleDB   │     └──────┬──────┘
+└─────────────────┘            │
+                               ▼
+                        ┌─────────────┐
+                        │  Dashboard  │
+                        └─────────────┘
 ```
 
 ## Tech Stack
