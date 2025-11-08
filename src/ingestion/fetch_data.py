@@ -9,9 +9,10 @@ from datetime import datetime, timezone
 from dotenv import load_dotenv
 import logging
 import time
-
+# Load stuff from .env
 load_dotenv()
 
+# Basic logging setup
 logging.basicConfig(
     level=logging.INFO,
     format="{asctime} - {levelname} - {message}",
@@ -21,7 +22,14 @@ logging.basicConfig(
 
 
 def _get_api_key() -> str:
-    """Get API key"""
+    """
+    Attempts to extract Alpha Vantage API key from the env.
+
+    Returns:
+        API_KEY: str
+    Raises:
+        ValueError: If the API key is not set in the .env file
+    """
     API_KEY = os.getenv("ALPHA_VANTAGE_API_KEY")
     if not API_KEY:
         raise ValueError(
@@ -53,12 +61,12 @@ def fetch_one_quote(ticker: str = "AAPL", max_retries: int = 3) -> dict:
     Example:
         >>> quote = fetch_one_quote("AAPL")
         >>> quote["symbol"]
-        "AAPL
+        "AAPL"
     """
 
     API_KEY = _get_api_key()
 
-    base_url = f"https://www.alphavantage.co/query"
+    base_url = "https://www.alphavantage.co/query"
     params = {
         "function": "GLOBAL_QUOTE",
         "symbol" : ticker,
@@ -103,7 +111,26 @@ def fetch_one_quote(ticker: str = "AAPL", max_retries: int = 3) -> dict:
 
 
 def fetch_many(tickers: list[str]) -> list[dict]:
-    """Fetch quotes for multiple tickers, rate limiting based on 5req/min for free alpha vantage sub"""
+    """
+    Fetch quotes for multiple tickers and spaces requests by 12s
+    to avoid rate limits on Alpha Vantage API free tier.
+
+    Time between requests is calculated as:
+    60s / 5 requests  = 12s ~ As defined in the API docs for the free tier
+
+    Args:
+        tickers: List of stock symbols to get quote data for
+    Returns:
+        results: List of dicts, each containing quote data for a stock
+    Raises:
+        RequestException: If the API fails to return data
+        KeyError, ValueError: If the API returns something we don't expect
+    """
+
+    if not tickers:
+        logging.warning(f"No tickers provided to fetch_many()")
+        return []
+    
     results = []
     failed_tickers = []
 
