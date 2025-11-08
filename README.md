@@ -70,7 +70,7 @@ This project aims to do the following:
 **Data Source:**
 - Alpha Vantage / Polygon.io / Yahoo Finance API
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Python 3.11+
