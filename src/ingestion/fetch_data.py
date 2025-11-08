@@ -35,9 +35,25 @@ def fetch_one_quote(ticker: str = "AAPL", max_retries: int = 3) -> dict:
     Fetch real-time quote for a ticker using Alpha Vantage API.
 
     Args:
-        ticker: Stock ticker symbol, defaults to AAPL
+        ticker: Stock symbol (e.g., 'AAPL', 'NVDA')
+    
     Returns:
-        Dictionary with data about the stock
+        Dictionary containing:
+        - symbol: Stock ticker
+        - price: Current price (float)
+        - volume: Trading volume (int)
+        - timestamp: Latest trading day (str)
+        - change_percent: Daily change percentage (str)
+        - fetched_at: UTC timestamp of fetch in ISO format
+
+    Raises:
+        ValueError: If API key is not found or API returns error
+        RequestException: If network request fails
+    
+    Example:
+        >>> quote = fetch_one_quote("AAPL")
+        >>> quote["symbol"]
+        "AAPL
     """
 
     API_KEY = _get_api_key()
