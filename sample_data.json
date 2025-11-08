@@ -1,0 +1,42 @@
+[
+  {
+    "symbol": "AAPL",
+    "price": 268.47,
+    "volume": 48227365,
+    "timestamp": "2025-11-07",
+    "change_percent": "-0.4819%",
+    "fetched_at": "2025-11-08T13:41:09.376197+00:00"
+  },
+  {
+    "symbol": "GOOG",
+    "price": 279.7,
+    "volume": 21991128,
+    "timestamp": "2025-11-07",
+    "change_percent": "-1.9766%",
+    "fetched_at": "2025-11-08T13:41:09.522260+00:00"
+  },
+  {
+    "symbol": "PLTR",
+    "price": 177.93,
+    "volume": 73989654,
+    "timestamp": "2025-11-07",
+    "change_percent": "1.6452%",
+    "fetched_at": "2025-11-08T13:41:09.816270+00:00"
+  },
+  {
+    "symbol": "NVDA",
+    "price": 188.15,
+    "volume": 264942255,
+    "timestamp": "2025-11-07",
+    "change_percent": "0.0372%",
+    "fetched_at": "2025-11-08T13:41:09.970851+00:00"
+  },
+  {
+    "symbol": "AMZN",
+    "price": 244.41,
+    "volume": 46374294,
+    "timestamp": "2025-11-07",
+    "change_percent": "0.5637%",
+    "fetched_at": "2025-11-08T13:41:10.118378+00:00"
+  }
+]
