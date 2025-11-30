@@ -64,14 +64,45 @@ class DatabaseConnection:
             except psycopg2.Error as e:
                 logger.error(f"Error closing connection: {e}")
         
-    def __enter__(self):  # Context manager
-        pass
-    def __exit__(self):   # Context manager
-        pass
+    def __enter__(self):
+        """Context manager entry"""
+        self.connect()
+        return self
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """
+        Context manager exit
+        
+        Args:
+            exc_type: Type of exception if one ocurred, otherwise None
+            exc_val: Exception instance, otherwise None
+            exc_tb: Exception traceback, otherwise None
+        """
+
+        if exc_type is None:
+            if self.conn:
+                self.conn.commit() #commit changes, success
+        else:
+            if self.conn:
+                self.conn.rollback() # Error, rollback changes
+                logger.error(
+                    "An error ocurred, details below\n"
+                    f"Exc type/value: {exc_type.__name__}/{exc_val}\n"
+                )
+        self.close()
     
     # 2. Write operations
     def insert_quote(self, quote: dict) -> bool:
-        pass
+        """
+        Inserts a single quote into the db.
+
+        Args:
+            quote: Dictionary with keys: symbol, price, volume, change_percent, timestamp, fetched_at
+
+        Returns:
+            True if transaction is successful, False otherwise.
+        """
+
+        
     def insert_quotes_batch(self, quotes: list) -> int:
         pass
     
