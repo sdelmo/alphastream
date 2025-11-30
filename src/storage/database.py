@@ -94,6 +94,7 @@ class DatabaseConnection:
     def insert_quote(self, quote: dict) -> bool:
         """
         Inserts a single quote into the db.
+        Uses UPSERT.
 
         Args:
             quote: Dictionary with keys: symbol, price, volume, change_percent, timestamp, fetched_at
@@ -102,7 +103,38 @@ class DatabaseConnection:
             True if transaction is successful, False otherwise.
         """
 
-        
+        INSERT_INTO = """
+            INSERT INTO stock_quotes
+            (symbol, price, volume, change_percent, trading_day, fetched_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (symbol, fetched_at)
+            DO UPDATE SET
+                price = EXCLUDED.price,
+                volume = EXCLUDED.volume,
+                change_percent = EXCLUDED.change_percent,
+                trading_day = EXCLUDED.trading_day
+        """
+        try:
+            values = (
+                quote["symbol"],
+                quote["price"],
+                quote["volume"],
+                quote["change_percent"],
+                quote["timestamp"],
+                quote["fetched_at"]
+            )
+
+            self.cursor.execute(INSERT_INTO, values)
+            logger.debug(f"Successfully inserted/updated quote for {quote['symbol']}")
+            return True
+        except psycopg2.Error as e:
+            logger.error(f"Error while writing data: {e}")
+            return False
+        except KeyError as e:
+            logger.error(f"Missing required field in quote: {e}")
+            return False
+
+
     def insert_quotes_batch(self, quotes: list) -> int:
         pass
     
