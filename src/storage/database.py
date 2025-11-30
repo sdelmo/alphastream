@@ -1,4 +1,5 @@
 import psycopg2
+from psycopg2.extras import execute_batch
 from dotenv import load_dotenv
 import os
 import logging
@@ -103,7 +104,7 @@ class DatabaseConnection:
             True if transaction is successful, False otherwise.
         """
 
-        INSERT_INTO = """
+        sql = """
             INSERT INTO stock_quotes
             (symbol, price, volume, change_percent, trading_day, fetched_at)
             VALUES (%s, %s, %s, %s, %s, %s)
@@ -135,8 +136,50 @@ class DatabaseConnection:
             return False
 
 
-    def insert_quotes_batch(self, quotes: list) -> int:
-        pass
+    def insert_quotes_batch(self, quotes: list[dict]) -> int:
+        """
+        Insert multiple quotes in a single transation.
+        Uses execute_batch
+
+        Returns:
+            Number of quotes successfully inserted.
+        """
+        sql = """
+            INSERT INTO stock_quotes
+            (symbol, price, volume, change_percent, trading_day, fetched_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            ON CONFLICT (symbol, fetched_at)
+            DO UPDATE SET
+                price = EXCLUDED.price,
+                volume = EXCLUDED.volume,
+                change_percent = EXCLUDED.change_percent,
+                trading_day = EXCLUDED.trading_day
+        """
+
+        if not quotes:
+            logger.warning("No quotes to insert")
+            return 0
+        try:
+            data = [
+                (
+                    quote["symbol"],
+                    quote["price"],
+                    quote["volume"],
+                    quote["change_percent"],
+                    quote["timestamp"],
+                    quote["fetched_at"]
+                ) for quote in quotes
+            ]
+            execute_batch(self.cursor, sql, data, page_size=100)
+            logger.info(f"Batch inserted {len(quotes)} quotes")
+            return len(quotes)
+        except psycopg2.Error as e:
+            logger.error(f"Error while writing batch: {e}")
+            raise
+        except KeyError as e:
+            logger.error(f"Error while parsing quotes: {e}")
+            raise
+
     
     # 3. Read operations
     def get_latest_quote(self, symbol: str) -> dict:
